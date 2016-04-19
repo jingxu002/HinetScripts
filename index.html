@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>HinetScripts by seisman</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>HinetScripts</h1>
+        <h2>Python scripts for Hi-net data request, download and process</h2>
+        <a href="https://github.com/seisman/HinetScripts" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <p>This is a collection of scripts to request, download and process continuous
+waveform data avaiable from <a href="http://www.hinet.bosai.go.jp">NIED Hi-net</a> website.</p>
+
+<p>It does not come with any warranties, nor is it guaranteed to work on your
+computer. The user assumes full responsibility for the use of all scripts.
+The author is <strong>NOT</strong> responsible for any damage that may follow from correct
+<em>or</em> incorrect use of these scripts.</p>
+
+<h2>
+<a id="dependency" class="anchor" href="#dependency" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependency</h2>
+
+<ul>
+<li>Python 3.3, 3.4, 3.5 (Python 2 is <strong>NOT</strong> supported)</li>
+<li>Python third-party modules
+
+<ul>
+<li><a href="http://docs.python-requests.org">requests</a></li>
+<li><a href="https://github.com/kennethreitz/clint">clint</a></li>
+<li><a href="http://docopt.org/">docopt</a></li>
+</ul>
+</li>
+<li>Hinet <a href="https://hinetwww11.bosai.go.jp/auth/manual/dlDialogue.php?r=win32tools">win32tools</a>: <code>catwin32</code> and <code>win2sac_32</code> in your <code>PATH</code>
+</li>
+</ul>
+
+<h2>
+<a id="how-to-get" class="anchor" href="#how-to-get" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to get</h2>
+
+<p>If you use <code>git</code>, just clone it to your working directory:</p>
+
+<pre><code>git clone https://github.com/seisman/HinetScripts.git
+</code></pre>
+
+<p>After <code>git clone</code>, you can get the latest version anytime with just one command:</p>
+
+<pre><code>git pull
+</code></pre>
+
+<p>If you do not use <code>git</code>, just click the "Download ZIP" button on the top.</p>
+
+<h2>
+<a id="before-you-use-it" class="anchor" href="#before-you-use-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Before you use it</h2>
+
+<ol>
+<li>Make sure your Python version &gt;= 3.3</li>
+<li>Install Python third-party modules by <code>pip install -r requirements.txt</code>
+</li>
+<li>Register on the <a href="http://www.hinet.bosai.go.jp">NIED Hi-net</a> website, so that you have access to NIED
+waveform data</li>
+<li>Download <a href="https://hinetwww11.bosai.go.jp/auth/manual/dlDialogue.php?r=win32tools">win32tools</a> and compile it, make sure binary <code>catwin32</code> and
+<code>win2sac_32</code> are in you PATH</li>
+<li>Request, download and process data <strong>manually</strong> at least one time, make sure
+that you know the whole procedures and limitations of NIED website</li>
+<li>Modify <code>User</code> and <code>Password</code> in configure file <code>Hinet.cfg</code>
+</li>
+<li>Run <code>HinetDoctor.py</code> to check your configure file</li>
+</ol>
+
+<p>If you can read Chinese, <a href="http://seisman.info/hinet-things.html">posts</a> listed
+in my blog may help you understand details.</p>
+
+<p>如果你能读懂中文，我博客列出的一些 <a href="http://seisman.info/hinet-things.html">博文</a>
+会帮助你更好地理解其中的细节。部分博文未及时更新，若有冲突，请以本文为准。</p>
+
+<h2>
+<a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quick Start</h2>
+
+<p>If you want a quick start, just copy and run commands below.</p>
+
+<p>This quick start exmaple, shows how to request waveform data from
+2010:10:01T15:00:00(+0900) to 2010:10:01T15:20:00(+0900):</p>
+
+<pre><code>$ python HinetDoctor.py
+$ python HinetContRequest.py 2010 10 01 15 00 20 -d 201010010600
+$ python rdhinet.py 201010010600
+$ python ch2pz.py 201010010600
+</code></pre>
+
+<p>If everything goes right, you will have one cnt file, one channel table file,
+several SAC files and SAC polezero files under directory <code>201010010600</code>.</p>
+
+<h2>
+<a id="scripts" class="anchor" href="#scripts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Scripts</h2>
+
+<h3>
+<a id="hinetdoctorpy" class="anchor" href="#hinetdoctorpy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>HinetDoctor.py</h3>
+
+<p><code>HinetDoctor.py</code> checks whether your configures goes right, you should run it
+everytime after you modify <code>Hinet.cfg</code>.</p>
+
+<ol>
+<li>Python version &gt;= 3.3</li>
+<li>All third-party modules installed</li>
+<li>Correct username and password</li>
+<li>Version of Hi-net website</li>
+<li>Binary <code>catwin32</code> and <code>win2sac_32</code> in PATH and executable</li>
+<li>Number of stations selected for Hi-net and F-net?</li>
+<li>
+<code>Maxspan</code> in allowed range</li>
+</ol>
+
+<h3>
+<a id="stationselectorpy" class="anchor" href="#stationselectorpy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>StationSelector.py</h3>
+
+<p><code>StationSelector.py</code> is used to select stations you want to request data.
+In most cases, you should use the web version provided by Hi-net website.
+This script is only for people who need to change stations frequently.</p>
+
+<h4>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h4>
+
+<pre><code>Select Hi-net/F-net stations to request waveform data from NIED
+
+Usage:
+    StationSelector.py -c CODE [-l LIST]
+    StationSelector.py -h
+
+Options:
+    -h, --help              Show this help.
+    -c CODE, --code=CODE    Network code. Hi-net: 0101, F-net: 0103.
+    -l LIST, --list=LIST    Station list file.
+</code></pre>
+
+<h4>
+<a id="notes" class="anchor" href="#notes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Notes</h4>
+
+<ol>
+<li>You can only select stations of Hi-net or F-net.</li>
+<li>All stations will be selected if -l options is NOT used.</li>
+<li>List file contains station list, one station per line, lines start with '#'
+will be ignored.</li>
+<li>This script does <strong>NOT</strong> check whether a station belongs to a network.</li>
+<li>You may need to run <code>HinetDoctor.py</code> again to check your station selection.</li>
+</ol>
+
+<h4>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h4>
+
+<ol>
+<li>
+<p>Select all stations of Hi-net</p>
+
+<p>$ python StationSelector.py -c 0101</p>
+</li>
+<li>
+<p>Select several stations list in a file:</p>
+
+<pre><code>$ cat sta.list
+N.FJ2H
+N.OTWH
+N.IICH
+N.SMGH
+$ python StationSelector.py -c 0101 -l sta.list
+</code></pre>
+</li>
+</ol>
+
+<h3>
+<a id="hinetcontrequestpy" class="anchor" href="#hinetcontrequestpy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>HinetContRequest.py</h3>
+
+<p><code>HinetContRequest.py</code> is used to request and download data from NIED server.</p>
+
+<h4>
+<a id="usage-1" class="anchor" href="#usage-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h4>
+
+<pre><code>$ python HinetContRequest.py -h
+Request continuous waveform data from NIED Hi-net.
+
+Usage:
+    HinetContRequest.py &lt;year&gt; &lt;month&gt; &lt;day&gt; &lt;hour&gt; &lt;min&gt; &lt;span&gt; [options]
+    HinetContRequest.py -h
+
+Arguments for continuous waveform data:
+    &lt;year&gt;, &lt;month&gt;, &lt;day&gt;, &lt;hour&gt;, &lt;min&gt;: Starting time in JST time.
+    &lt;span&gt;:                                Duration in minutes.
+
+Options:
+    -h, --help              Show this help.
+    -c CODE --code=CODE     Select code for organization and network.
+    -m SPAN --maxspan=SPAN  Max time span for sub-requests
+    -d DIR --directory=DIR  Output directory. Default: current directory.
+    -o FILE --output=FILE   Output filename.
+                            Default: CODE_YYYYMMDDHHMM_SPAN.cnt
+    -t FILE --ctable=FILE   Channel table filename. Default: CODE_YYYYMMDD.ch
+</code></pre>
+
+<h4>
+<a id="examples-1" class="anchor" href="#examples-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h4>
+
+<ol>
+<li>
+<p>Request data of Hi-net starting from 2010-10-01T15:00:00 (<strong>JST</strong>)
+with duration of 20 minutes:</p>
+
+<pre><code>python HinetContRequest.py 2010 10 01 15 00 20
+</code></pre>
+</li>
+<li>
+<p>Request data of F-net starting from 2010-10-01T15:00:00 (<strong>JST</strong>)
+with duration of 20 minutes</p>
+
+<pre><code>python HinetContRequest.py 2010 10 01 15 00 20 -c 0103
+</code></pre>
+</li>
+<li>
+<p>Request data of Hi-net, with customized output directory. (<strong>Highly Recommended</strong>)</p>
+
+<pre><code>python HinetContRequest.py 2010 10 01 15 00 20 -d 201010010600
+</code></pre>
+</li>
+<li>
+<p>Request data of Hi-net, with customized output directory and filename</p>
+
+<pre><code>python HinetContRequest.py 2010 10 01 15 00 20 -d aaa -o aaa.cnt -t aaa.ch
+</code></pre>
+</li>
+</ol>
+
+<p>If you run <code>HinetContRequest.py</code> in the highly recommender way (Example 3),
+you will get a directory <code>201010010600</code> with two file inside:
+<code>0101_201010011500_20.cnt</code> and <code>0101_20101001.ch</code>.</p>
+
+<pre><code>|-- 201010010600
+    |-- 0101_201010011500_20.cnt
+    `-- 0101_20101001.ch
+</code></pre>
+
+<h4>
+<a id="notes-1" class="anchor" href="#notes-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Notes</h4>
+
+<ol>
+<li>Starting time is in JST, which is UTC+09:00, nine hour ahead of UTC.</li>
+<li>
+<code>&lt;span&gt;</code> is in minutes.</li>
+<li>Options <code>-o</code> and <code>-t</code> allow you customizing output filenames.
+Since the filename format of cnt file and channel tables are
+hard coded in <code>rdhinet.py</code> and <code>ch2pz.py</code>, you should <strong>NEVER</strong>
+use these two options unless you are able to modify the source code.</li>
+</ol>
+
+<h3>
+<a id="rdhinetpy" class="anchor" href="#rdhinetpy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>rdhinet.py</h3>
+
+<p><code>rdhinet.py</code> is used to extract SAC files from WIN32 file.</p>
+
+<h4>
+<a id="usage-2" class="anchor" href="#usage-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h4>
+
+<pre><code>Extract SAC data files from NIED Hi-net WIN32 files
+
+Usage:
+    rdhinet.py DIRNAME [-C &lt;comps&gt;] [-D &lt;outdir&gt;] [-S &lt;suffix&gt;] [-P &lt;procs&gt;]
+    rdhinet.py -h
+
+Options:
+    -h          Show this help.
+    -C &lt;comps&gt;  Components to extract, delimited using commas.
+                Avaiable components are U, N, E, X, Y et al.
+                Default to extract all components.
+    -D &lt;outdir&gt; Output directory for SAC files.
+    -S &lt;suffix&gt; Suffix of output SAC files. Default: no suffix.
+    -P &lt;procs&gt;  Parallel using multiple processes.
+                Set number of CPUs to &lt;procs&gt; if &lt;procs&gt; equals 0. [default: 0]
+</code></pre>
+
+<h4>
+<a id="examples-2" class="anchor" href="#examples-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h4>
+
+<ol>
+<li>
+<p>Extract all channels</p>
+
+<pre><code>python rdhinet.py 201010010600
+</code></pre>
+</li>
+<li>
+<p>Extract NEU components with suffix 'SAC'</p>
+
+<pre><code>python rdhinet.py 201010010600 -C U,N,E -S SAC
+</code></pre>
+</li>
+</ol>
+
+<p>In most cases, what you need is only <code>-C</code> option.</p>
+
+<p>If you run <code>python rdhinet.py 201010010600 -C U</code>, you will get SAC files
+looks like <code>N.FRNH.U</code> under directory <code>201010010600</code>.</p>
+
+<h3>
+<a id="ch2pypy" class="anchor" href="#ch2pypy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ch2py.py</h3>
+
+<p><code>ch2pz.py</code> is used to extract SAC PZ files from Channel Table file.</p>
+
+<h4>
+<a id="attentions" class="anchor" href="#attentions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Attentions</h4>
+
+<ul>
+<li>
+<code>ch2pz.py</code> only works for components whose input unit is <code>m/s</code>.</li>
+<li>
+<code>ch2pz.py</code> may only works for Hi-net short period instruments.</li>
+<li>
+<code>ch2pz.py</code> does <strong>NOT</strong> work for F-net.</li>
+</ul>
+
+<h4>
+<a id="usage-3" class="anchor" href="#usage-3" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h4>
+
+<pre><code>$ python ch2pz.py -h
+Convert NIED Hi-net Channel Table file to SAC PZ files
+
+Usage:
+    ch2pz.py DIRNAME [-C &lt;comps&gt;] [-D &lt;outdir&gt;] [-S &lt;suffix&gt;]
+
+Options:
+    -C &lt;comps&gt;    Channel Components to convert. Choose from U,N,E,X,Y et. al.
+                  Default to convert all components.
+    -D &lt;outdir&gt;   Output directory of SAC PZ files. Use the directory of
+                  Channel Table file as default.
+    -S &lt;suffix&gt;   Suffix for SAC PZ files. [default: SAC_PZ]
+</code></pre>
+
+<h4>
+<a id="examples-3" class="anchor" href="#examples-3" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h4>
+
+<ol>
+<li>
+<p>Extract all channels</p>
+
+<pre><code>python ch2pz.py 201010010600
+</code></pre>
+</li>
+<li>
+<p>Extract NEU components</p>
+
+<pre><code>python ch2pz.py 201010010600 -C U,N,E
+</code></pre>
+</li>
+</ol>
+
+<p>In most cases, what you need is only <code>-C</code> option.</p>
+
+<p>If you run <code>python ch2pz.py 201010010600 -C U</code>, you will get SAC PoleZero
+files looks like <code>N.FRNH.U.SAC_PZ</code> under directory <code>201010010600</code>.</p>
+
+<h2>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FAQ</h2>
+
+<h3>
+<a id="what-is-network-code" class="anchor" href="#what-is-network-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is network code?</h3>
+
+<p>Each network is represented by a network code. For example, Hi-net
+network has a code of '0101', while V-net '0105'. You can see the full
+code list by running <code>python HinetContRequest.py -h</code>.</p>
+
+<h3>
+<a id="what-is-maxspan-and-how-to-choose-it" class="anchor" href="#what-is-maxspan-and-how-to-choose-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is Maxspan? And how to choose it?</h3>
+
+<p>NIED Hi-net website sets a limitation of data size in one request:</p>
+
+<ol>
+<li>Record Length &lt;= 60 min</li>
+<li>Number of channels * Record Length &lt;= 12000 min</li>
+</ol>
+
+<p>Just take Hi-net as example, Hi-net network has about 800 station and
+24000 channels. According to the limitations, the record length should
+be no more than 5 minutes long in one web request. So the <code>Maxspan</code>,
+allowed maximum record length, should be no more than 5 for Hi-net
+network with all stations selected.</p>
+
+<p>The request script <code>HinetContRequest.py</code> helps you break through the
+limitation. Using this script, you can requst datas with a much longer
+record length, this script will split the request into multiple
+sub-requests, each has a record length no more than <code>Maxspan</code> minutes.</p>
+
+<h3>
+<a id="whats-the-workflow-of-hinetcontrequestpy" class="anchor" href="#whats-the-workflow-of-hinetcontrequestpy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's the workflow of HinetContRequest.py?</h3>
+
+<ol>
+<li>read configure file</li>
+<li>login Hi-net website</li>
+<li>check whether starting time is in service period</li>
+<li>if <code>&lt;span&gt;</code> is larger than <code>MaxSpan</code>, split this request into multiple
+sub-requests, each has a duration no larger than <code>MaxSpan</code>
+</li>
+<li>start the first sub-request, wait until the data is ready, then
+remember the ID</li>
+<li>repeat step 5 for all sub-requests, and remember all IDs</li>
+<li>download all datas in zip format</li>
+<li>unzip all zip files, merge all cnt files into one cnt file</li>
+<li>rename and cleanup</li>
+</ol>
+
+<h3>
+<a id="whats-maxsleepcount-and-sleeptime" class="anchor" href="#whats-maxsleepcount-and-sleeptime" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's MaxSleepCount and SleepTime?</h3>
+
+<p>After posting a data request, Hi-net server will deal with this request and
+prepare waveform data. During the preparation, user is not allowed to post
+another new request. So user has to wait until the data is ready.</p>
+
+<p>The script will check the status of data preparation. If the data is not ready,
+it will sleep for <code>SleepTime</code> seconds, and then check the status again, until
+the data is ready or the number of checks larger than <code>MaxSleepCount</code>.</p>
+
+<p>So the maximum sleep time for one request is MaxSleepCount*SleepTime seconds,
+if the data is still not ready, the script will report an error.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/seisman/HinetScripts/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/seisman/HinetScripts/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/seisman/HinetScripts"></a> is maintained by <a href="https://github.com/seisman">seisman</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
