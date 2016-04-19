@@ -36,13 +36,7 @@ avaiable from <a href="http://www.hinet.bosai.go.jp">NIED Hi-net</a> website.</p
 
 <ul>
 <li>Python 3.3+</li>
-<li>Python third-party modules
-
-<ul>
-<li><a href="http://docs.python-requests.org">requests</a></li>
-<li><a href="https://github.com/kennethreitz/clint">clint</a></li>
-<li><a href="http://docopt.org/">docopt</a></li>
-</ul>
+<li>Python modules: <a href="http://docs.python-requests.org">requests</a>, <a href="https://github.com/kennethreitz/clint">clint</a>, <a href="http://docopt.org/">docopt</a>
 </li>
 <li>Hinet <a href="https://hinetwww11.bosai.go.jp/auth/manual/dlDialogue.php?r=win32tools">win32tools</a>: <code>catwin32</code> and <code>win2sac_32</code> in your <code>PATH</code>
 </li>
@@ -51,17 +45,14 @@ avaiable from <a href="http://www.hinet.bosai.go.jp">NIED Hi-net</a> website.</p
 <h2>
 <a id="how-to-get" class="anchor" href="#how-to-get" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to get</h2>
 
-<p>If you use <code>git</code>, just clone it to your working directory:</p>
-
-<pre><code>git clone https://github.com/seisman/HinetScripts.git
-</code></pre>
-
-<p>After <code>git clone</code>, you can get the latest version anytime with just one command:</p>
-
-<pre><code>git pull
-</code></pre>
-
-<p>If you do not use <code>git</code>, just click the "Download ZIP" button on the top.</p>
+<ul>
+<li>Git users: 
+~~~
+$ git clone <a href="https://github.com/seisman/HinetScripts.git">https://github.com/seisman/HinetScripts.git</a>
+~~~</li>
+<li>Other users: <a href="https://github.com/seisman/HinetScripts/archive/master.zip">Downloaz ZIP</a>
+</li>
+</ul>
 
 <h2>
 <a id="before-you-use-it" class="anchor" href="#before-you-use-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Before you use it</h2>
@@ -90,9 +81,7 @@ in my blog may help you understand details.</p>
 <h2>
 <a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quick Start</h2>
 
-<p>If you want a quick start, just copy and run commands below.</p>
-
-<p>This quick start exmaple, shows how to request waveform data from
+<p>This quick start example, shows how to request waveform data from
 2010:10:01T15:00:00(+0900) to 2010:10:01T15:20:00(+0900):</p>
 
 <pre><code>$ python HinetDoctor.py
@@ -113,13 +102,15 @@ several SAC files and SAC polezero files under directory <code>201010010600</cod
 <p><code>HinetDoctor.py</code> checks whether your configures goes right, you should run it
 everytime after you modify <code>Hinet.cfg</code>.</p>
 
+<p>Checklist: </p>
+
 <ol>
 <li>Python version &gt;= 3.3</li>
 <li>All third-party modules installed</li>
 <li>Correct username and password</li>
 <li>Version of Hi-net website</li>
 <li>Binary <code>catwin32</code> and <code>win2sac_32</code> in PATH and executable</li>
-<li>Number of stations selected for Hi-net and F-net?</li>
+<li>Number of stations selected for Hi-net and F-net</li>
 <li>
 <code>Maxspan</code> in allowed range</li>
 </ol>
@@ -151,9 +142,8 @@ Options:
 
 <ol>
 <li>You can only select stations of Hi-net or F-net.</li>
-<li>All stations will be selected if -l options is NOT used.</li>
-<li>List file contains station list, one station per line, lines start with '#'
-will be ignored.</li>
+<li>All stations will be selected if <code>-l</code> options is <strong>NOT</strong> used.</li>
+<li>List file contains station list, one station per line, lines start with <code>#</code> will be ignored.</li>
 <li>This script does <strong>NOT</strong> check whether a station belongs to a network.</li>
 <li>You may need to run <code>HinetDoctor.py</code> again to check your station selection.</li>
 </ol>
@@ -165,7 +155,8 @@ will be ignored.</li>
 <li>
 <p>Select all stations of Hi-net</p>
 
-<p>$ python StationSelector.py -c 0101</p>
+<pre><code>$ python StationSelector.py -c 0101
+</code></pre>
 </li>
 <li>
 <p>Select several stations list in a file:</p>
@@ -374,8 +365,8 @@ files looks like <code>N.FRNH.U.SAC_PZ</code> under directory <code>201010010600
 <h3>
 <a id="what-is-network-code" class="anchor" href="#what-is-network-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is network code?</h3>
 
-<p>Each network is represented by a network code. For example, Hi-net
-network has a code of '0101', while V-net '0105'. You can see the full
+<p>Each network is represented by a network code. For example, Hi-net 
+network has a code of <code>0101</code>, while V-net <code>0105</code>. You can see the full
 code list by running <code>python HinetContRequest.py -h</code>.</p>
 
 <h3>
